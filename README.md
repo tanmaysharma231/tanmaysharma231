@@ -2,6 +2,7 @@
 - 👋 Hi, I’m @tanmaysharma231
 - 👀 I’m interested in Robotics, Machine learning, and cognitive learning
 - 🌱 I’m currently learning Computer vision
+- LinkedIn-https://www.linkedin.com/in/tanmay-sharma-4a21b017a/
 - 💞️ I’m looking to collaborate on ...
 - 📫 How to reach me ...
 
