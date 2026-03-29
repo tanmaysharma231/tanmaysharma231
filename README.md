@@ -11,15 +11,37 @@ I'm more energized by figuring out what needs to be built and why than by implem
 ## What I'm Working On
 
 **SEC Regulatory Document Interpreter**
-A pipeline that takes raw SEC regulatory PDFs and produces structured obligations with CFR citations, then interprets each one using the SEC's own comment responses. The insight that drove it: extraction is not the hard part. Interpretation is. Figuring out what an obligation means operationally, what is ambiguous, and what a company actually needs to change is where the real difficulty lives.
 
-Built and tested on the 2023 SEC Cybersecurity Disclosure Rule (Release 33-11216). Current approach uses structural document parsing to identify obligation sections deterministically before passing to an LLM, with a secondary fallback pass to catch scope modifiers and implied requirements.
+    A pipeline that takes raw SEC regulatory PDFs and produces structured obligations with CFR citations, then
+    interprets each one with grounding in the SEC's own reasoning. The core insight: extraction is not the hard part —
+    interpretation is. Figuring out what an obligation means operationally, what is ambiguous, and what a company
+    actually needs to change is where the real difficulty lives.
 
-- Stage 1: Structural ingestion with no LLM, heading detection, chunk scoring
-- Stage 2: Structure-first obligation extraction with CFR citations and schema validation
-- Stage 3: Interpretation using context bundles built from SEC comment responses and live CFR API data
+    Built and tested on the 2023 SEC Cybersecurity Disclosure Rule (Release 33-11216).
 
-Tools: Python, GPT-4o, Pydantic, SEC EDGAR API, US CFR API
+    Stage 1 — Structural Ingestion (no LLM)
+    Heading-aware section builder with deterministic section detection, chunk scoring via hot-zone flags
+    (has_obligations, has_definitions, has_dates, has_scope), and subsection role classification (proposed / comments /
+    final / other). Chunk sizing targets ~4000 chars with 600-char overlap within sections.
+
+    Stage 2 — Structure-First Extraction
+    Obligation extraction using only final-rule and codified-text chunks. Schema-validated output with CFR citations,
+    trigger conditions, deadlines, and disclosure fields. A secondary bin pass catches scope modifiers, implied
+    requirements, and missed obligations the main extractor skipped.
+
+    Stage 3 — Agentic Interpretation
+    Lean-start context model: each obligation starts with only its own source chunks. The LLM signals what it needs via
+    lookup requests; the pipeline fetches targeted passages from the document, then re-interprets once with the
+    augmented context. A CFR reference resolution loop fetches live regulatory text via the US CFR API. Obligations can
+    declare parent relationships — e.g. a national security delay exception flagging itself as a subset of the main 8-K
+    filing obligation.
+
+    Stage 4 — LLM-as-Judge Evaluation
+    ID-agnostic coverage scoring against reference criteria drawn from SEC releases and compliance publications. The
+    judge evaluates the full set of interpretations collectively per criterion, not just the ID-matched entry, so
+    obligations split by the extractor are scored correctly.
+
+    Tools: Python, GPT-4o / GPT-4o-mini, Pydantic, LangChain, SEC EDGAR API, US CFR API
 
 ---
 
