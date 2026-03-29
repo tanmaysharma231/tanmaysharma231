@@ -36,10 +36,6 @@ I'm more energized by figuring out what needs to be built and why than by implem
     declare parent relationships — e.g. a national security delay exception flagging itself as a subset of the main 8-K
     filing obligation.
 
-    Stage 4 — LLM-as-Judge Evaluation
-    ID-agnostic coverage scoring against reference criteria drawn from SEC releases and compliance publications. The
-    judge evaluates the full set of interpretations collectively per criterion, not just the ID-matched entry, so
-    obligations split by the extractor are scored correctly.
 
     Tools: Python, GPT-4o / GPT-4o-mini, Pydantic, LangChain, SEC EDGAR API, US CFR API
 
